@@ -1,0 +1,79 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+model User{
+
+  id         String @id @default(uuid())
+  name       String  @unique
+  password   String
+  cpf        String
+  compras    Compra[]
+
+  @@map("users")
+}
+
+model Employee {
+  
+  id          String  @id @default(uuid())
+  name        String 
+  password    String
+  permissions String
+  adress      Adress?
+  product     Products[]
+}
+
+model Provider {
+  id           String @id @default(uuid())
+  name         String 
+  phone        String  
+  adress       Adress?
+}
+
+model Adress {
+  id          String @id @default(uuid())
+  id_employee String 
+  employee    Employee @relation(fields: [id_employee], references: [id])
+  id_provider String
+  provider    Provider @relation(fields: [id_provider], references: [id])
+  street      String
+  number      Int
+  district    String
+
+}
+
+model Tipo{
+  id String @id @default(uuid())
+  name_tipo String
+  products Products[]
+}
+
+model Products{
+  id             String @id @default(uuid())
+  name_product   String
+  preco          Float
+  codigo_barras  Int
+  id_employee    String
+  employee       Employee  @relation(fields: [id_employee], references: [id])
+  id_tipo        String
+  tipo           Tipo  @relation(fields: [id_tipo], references: [id])
+  compras        Compra[]
+}
+
+model Compra {
+  id               String @id @default(uuid())
+  user             User @relation(fields: [id_user], references: [id])
+  id_user          String
+  products         Products @relation(fields: [id_product], references: [id])
+  id_product       String
+  data             DateTime @default(now())
+}
